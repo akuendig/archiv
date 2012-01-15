@@ -1,0 +1,9 @@
+[submodule "bundle/millermedeiros-plugins"]
+	path = bundle/millermedeiros-plugins
+	url = https://github.com/millermedeiros/requirejs-plugins.git
+[submodule "bundle/rocketlabsdev-plugins"]
+	path = bundle/rocketlabsdev-plugins
+	url = https://github.com/rocketlabsdev/require-jade.git
+[submodule "bundle/requirejs"]
+	path = bundle/requirejs
+	url = https://github.com/jrburke/requirejs.git
