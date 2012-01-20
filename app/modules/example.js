@@ -1,12 +1,15 @@
 define([
-  "namespace",
-  "use!backbone"
+  "archiv",
+  "jquery",
+  "use!underscore",
+  "use!backbone",
+  "text!templates/example.html"
 ],
 
-function(namespace, Backbone) {
+function(archiv, $, _, Backbone, template) {
 
   // Create a new module
-  var Example = namespace.module();
+  var Example = archiv.module();
 
   // Example extendings
   Example.Model = Backbone.Model.extend({ /* ... */ });
@@ -15,17 +18,13 @@ function(namespace, Backbone) {
 
   // This will fetch the tutorial template and render it.
   Example.Views.Tutorial = Backbone.View.extend({
-    template: "app/templates/example.html",
+    id: "main",
 
-    render: function(done) {
-      var view = this;
-
-      // Fetch the template, render it to the View element and call done.
-      namespace.fetchTemplate(this.template, function(tmpl) {
-        view.el.innerHTML = tmpl();
-
-        done(view.el);
-      });
+    render: function() {
+      var compiled = this.compiled = this.compiled || _.template(template)
+        , test = compiled();
+      $("#main").html(compiled());
+      return this;
     }
   });
 

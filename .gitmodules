@@ -7,3 +7,6 @@
 [submodule "bundle/requirejs"]
 	path = bundle/requirejs
 	url = https://github.com/jrburke/requirejs.git
+[submodule "bundle/twitter-bootstrap"]
+	path = bundle/twitter-bootstrap
+	url = https://github.com/twitter/bootstrap.git

@@ -44,21 +44,34 @@ task.registerHelper("server", function(options) {
   // Require libraries
   var fs = require("fs");
   var express = require("express");
-  var site = express.createServer();
+  var app = express.createServer();
+
+  app.configure(function(){
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    app.use(app.router);
+  });
+
+  app.set("views", "./");
+  app.set('view options', {
+    layout: false
+  });
 
   // Serve static files from folders
   Object.keys(options.paths).sort().reverse().forEach(function(key) {
-    site.use("/" + key, express.static(options.paths[key]));
+    app.use("/" + key, express.static(options.paths[key]));
   });
 
   // Serve favicon.ico
-  site.use(express.favicon(options.favicon));
+  app.use(express.favicon(options.favicon));
 
   // Ensure all routes go home, client side app..
-  site.get("*", function(req, res) {
-    fs.createReadStream(options.index).pipe(res);
+  app.get("*", function(req, res) {
+    // fs.createReadStream(options.index).pipe(res);
+    res.render("index.jade");
   });
 
   // Actually listen
-  site.listen(options.port, options.host);
+  app.listen(options.port, options.host);
 });

@@ -86,4 +86,4 @@ config.init({
 });
 
 // Run the following tasks...
-task.registerTask("default", "clean lint requirejs jst");
+task.registerTask("default", "clean lint requirejs");

@@ -1,0 +1,1 @@
+../../../bundle/rocketlabsdev-plugins/jade.js

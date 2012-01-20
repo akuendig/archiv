@@ -1,4 +1,4 @@
-define("namespace", [
+define("archiv", [
   "jquery",
   "use!underscore",
   "use!backbone"
@@ -37,23 +37,23 @@ function($) {
 });
 
 require([
-  "namespace",
+  "archiv",
   "jquery",
   "use!backbone",
   "modules/example"
 ],
 
-function (namespace, jQuery, Backbone, Example) {
+function (archiv, jQuery, Backbone, Example) {
   // Treat the jQuery ready function as the entry point to the application.
   // Inside this function, kick-off all initialization, everything up to this
   // point should be definitions.
   jQuery(function($) {
 
     // Shorthand the application namespace
-    var app = namespace.app;
+    var app = archiv.app;
 
     // Defining the application router, you can attach sub routers here.
-    var Router = Backbone.Router.extend({
+    var MainRouter = Backbone.Router.extend({
       routes: {
         "": "index",
         ":hash": "index"
@@ -63,28 +63,25 @@ function (namespace, jQuery, Backbone, Example) {
         var route = this;
         var tutorial = new Example.Views.Tutorial();
 
-        // Attach the tutorial to the DOM
-        tutorial.render(function(el) {
-          $("#main").html(el);
+        tutorial.render();
 
-          // Fix for hashes in pushState and hash fragment
-          if (hash && !route._alreadyTriggered) {
-            // Reset to home, pushState support automatically converts hashes
-            Backbone.history.navigate("", false);
+        // Fix for hashes in pushState and hash fragment
+        if (hash && !route._alreadyTriggered) {
+          // Reset to home, pushState support automatically converts hashes
+          Backbone.history.navigate("", false);
 
-            // Trigger the default browser behavior
-            location.hash = hash;
+          // Trigger the default browser behavior
+          location.hash = hash;
 
-            // Set an internal flag to stop recursive looping
-            route._alreadyTriggered = true;
-          }
-        });
+          // Set an internal flag to stop recursive looping
+          route._alreadyTriggered = true;
+        }
       }
     });
-    
+
     // Define your master router on the application namespace and trigger all
     // navigation from this instance.
-    app.router = new Router();
+    app.router = new MainRouter();
 
     // Trigger the initial route and enable HTML5 History API support
     Backbone.history.start({ pushState: true });
@@ -94,7 +91,7 @@ function (namespace, jQuery, Backbone, Example) {
     // attribute, bypass the delegation completely.
     $(document).on("click", "a:not([data-bypass])", function(evt) {
       // Get the anchor href and protcol
-      var href = $(this).attr("href");
+      var href = this.attr("href");
       var protocol = this.protocol + "//";
 
       // Ensure the protocol is not part of URL, meaning its relative.
