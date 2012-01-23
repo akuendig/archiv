@@ -15,6 +15,7 @@ app.configure(function(){
 
 app.set("views", "./app/templates");
 app.set('view options', {
+  pretty: true,
   layout: false
 });
 

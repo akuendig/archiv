@@ -1,34 +1,55 @@
+/*jshint laxbreak:true */
 define("archiv", [
   "jquery",
   "use!underscore",
   "use!backbone"
 ],
 
-function($) {
+function($, _, Backbone) {
+  Backbone.View.prototype.start = function() {
+    if (this.model && this.modelEvents) {
+        _.each(
+          this.modelEvents,
+          function(functionName, event) {
+            this.model.bind(event, this[functionName]);
+          },
+          this);
+    }
+
+    return this;
+  };
+
+  Backbone.View.prototype.stop = function() {
+    if (this.model && this.modelEvents) {
+        _.each(
+          this.modelEvents,
+          function(functionName, event) {
+            this.model.unbind(event, this[functionName]);
+          },
+          this);
+    }
+
+    this.remove();
+    this.unbind();
+
+    return this;
+  };
+
+  Backbone.View.prototype.renderTemplate = function (data) {
+    var html = this.template(data || this.model.attributes)
+      , $el = this.$el || $('<div>');
+
+    $el[0] = html;
+    this.el = html;
+    this.$el = $el;
+
+    return this;
+  };
+
   return {
-    // This is useful when developing if you don't want to use a
-    // build process every time you change a template.
-    //
-    // Delete if you are using a different template loading method.
-    fetchTemplate: function(path, done) {
-      // Should be an instant synchronous way of getting the template, if it
-      // exists in the JST object.
-      var JST = this.JST = this.JST || {};
-      if (JST[path]) {
-        return done(JST[path]);
-      }
-
-      // Fetch it asynchronously if not available from JST
-      return $.get(path, function(contents) {
-        var tmpl = _.template(contents);
-        JST[path] = tmpl;
-        done(tmpl);
-      });
-    },
-
     // Create a custom object with a nested Views object
     module: function(additionalProps) {
-      return _.extend({ Views: {} }, additionalProps);
+      return _.extend({ Views: {}, Models: {} }, additionalProps);
     },
 
     // Keep active application instances namespaced under an app object.
@@ -40,10 +61,10 @@ require([
   "archiv",
   "jquery",
   "use!backbone",
-  "modules/example"
+  "modules/menu"
 ],
 
-function (archiv, jQuery, Backbone, Example) {
+function (archiv, jQuery, Backbone, Menu) {
   // Treat the jQuery ready function as the entry point to the application.
   // Inside this function, kick-off all initialization, everything up to this
   // point should be definitions.
@@ -60,10 +81,17 @@ function (archiv, jQuery, Backbone, Example) {
       },
 
       index: function(hash) {
-        var route = this;
-        var tutorial = new Example.Views.Tutorial();
+        var route = this
+          , menu = new Menu.MenuView({
+            collection: new Menu.Menu([
+              new Menu.Entry({name: 'Wirtschaft', href: 'wirtschaft'}),
+              new Menu.Entry({name: 'Schweiz', href: 'schweiz'}),
+              new Menu.Entry({name: 'Politik', href: 'politik'}),
+              new Menu.Entry({name: 'International', href: 'international'})
+            ])
+          });
 
-        tutorial.render();
+        menu.render();
 
         // Fix for hashes in pushState and hash fragment
         if (hash && !route._alreadyTriggered) {
@@ -91,11 +119,11 @@ function (archiv, jQuery, Backbone, Example) {
     // attribute, bypass the delegation completely.
     $(document).on("click", "a:not([data-bypass])", function(evt) {
       // Get the anchor href and protcol
-      var href = this.attr("href");
+      var href = this.href;
       var protocol = this.protocol + "//";
 
       // Ensure the protocol is not part of URL, meaning its relative.
-      if (href.slice(protocol.length) !== protocol) {
+      if (href.slice(0, protocol.length) !== protocol) {
         // Stop the default event to ensure the link will not cause a page
         // refresh.
         evt.preventDefault();

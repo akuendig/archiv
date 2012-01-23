@@ -1,41 +1,43 @@
-!!!
+!!! 5
 head
   meta(charset='utf-8')
   meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
   meta(name='viewport', content='width=device-width,initial-scale=1')
 
-  // title= pageTitle
+  title Artikel Archiv
 
-  // link(rel='stylesheet', href='/assets/css/style.css')
   link(rel='stylesheet', href='/assets/css/bootstrap/bootstrap.css')
+  link(rel='stylesheet', href='/assets/css/style.css')
 
   script(data-main='app/index', src='/assets/js/libs/require.js')
   script(src='/app/config.js')
-
 body
-  .topbar
-    .fill
+  .navbar.navbar-fixed
+    .navbar-inner
       .container
         a.brand(href='/') Artikel Archiv
         ul.nav
           li.active
-            a(href='/') Home
+            a(href='/') Tagesanzeiger
           li
-            a(href='/about') About
+            a(href='about') About
           li
-            a(href='/contact') Contact
-        form.pull-right(action='true')
+            a(href='contact') Contact
+      //
+        form.form-search.navbar-form.pull-right(action='')
           input.input-small(type='text', placeholder='Username')
           input.input-small(type='password', placeholder='Password')
           button.btn(type='submit') Sign in
-  .container
-    .content
-      .page-header
-        h1 Page Name
-        small Supporting text or tagline
+  .fluid-container.sidebar-left
+    #sidebar.fluid-sidebar
+      .well
+        ul#categories.nav.list
+          li.nav-header Sparten
+    #viewer.fluid-content
+      h1#viewer-title Article Title
       .row
-        .span10#main
-        .span4
-          h3 Secondary content
+        #viewer-summary.span4
+        img#viewer-image.span12
+      .row#viewer-content
     footer
-      p © Company 2011
+      p &copy; Adrian Kuendig 2011
