@@ -4,22 +4,22 @@ define([
   "jquery",
   "use!underscore",
   "use!backbone",
-  "jade!templates/menuEntry"
+  "jade!templates/sidebar-entry"
 ],
 
 function(archiv, $, _, Backbone, template) {
 
   // Create a new module
-  var Menu = archiv.module();
+  var Sidebar = archiv.module();
 
-  Menu.Entry = Backbone.Model.extend({
+  Sidebar.Entry = Backbone.Model.extend({
     defaults : {
       name: 'Unset Title',
-      href: 'error/defaultMenuLink'
+      href: 'error/defaultSidebarLink'
     }
   });
 
-  Menu.EntryView = Backbone.View.extend({
+  Sidebar.EntryView = Backbone.View.extend({
     template: template,
 
     initialize: function () {
@@ -31,65 +31,60 @@ function(archiv, $, _, Backbone, template) {
     },
 
     select: function ( event ) {
-      var $el = this.$el;
+      var $el = this.el;
 
       if ($el) {
         $el.addClass('active');
       }
 
-      archiv.app.trigger('menu:select', this);
+      archiv.app.trigger('sidebar:select', this);
       return this;
     },
 
     unselect: function ( event ) {
+      var $el = this.el;
+
       if ($el) {
         $el.removeClass('active');
       }
 
-      archiv.app.trigger('menu:unselect', this);
+      archiv.app.trigger('sidebar:unselect', this);
       return this;
     },
 
     render: function ( event ) {
-      this.renderTemplate();
-      return this;
+      return this.renderTemplate();
     }
   });
 
-  Menu.Menu = Backbone.Collection.extend({
-    model: Menu.Entry
+  Sidebar.Sidebar = Backbone.Collection.extend({
+    model: Sidebar.Entry
   });
 
-  Menu.MenuView = Backbone.View.extend({
+  Sidebar.SidebarView = Backbone.View.extend({
     el: $('#categories'),
 
-    initialize: function () {
-      this.render();
-    },
-
     render: function () {
-      var $el = this.$el || $(this.el);
-      this.$el = $el;
+      var $el = this.el;
 
-      $el.
-        find('li').
-        not('.nav-header').
-        each(function () {
+      $el
+        .find('li')
+        .not('.nav-header')
+        .each(function () {
           $.data(this, 'view').stop();
         });
 
       this.collection.each(function (entry) {
-        var view = new Menu.EntryView({
+        var view = new Sidebar.EntryView({
           model: entry
         });
 
-        view.
-          start().
-          render().
-          $el.
-            appendTo($el).
-            data('view', view);
-
+        view
+          .start()
+          .render()
+          .el
+            .appendTo($el)
+            .data('view', view);
       });
 
       return this;
@@ -97,6 +92,6 @@ function(archiv, $, _, Backbone, template) {
   });
 
   // Required, return the module for AMD compliance
-  return Menu;
+  return Sidebar;
 
 });

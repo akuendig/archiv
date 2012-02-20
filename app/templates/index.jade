@@ -9,10 +9,10 @@ head
   link(rel='stylesheet', href='/assets/css/bootstrap/bootstrap.css')
   link(rel='stylesheet', href='/assets/css/style.css')
 
-  script(data-main='app/index', src='/assets/js/libs/require.js')
+  script(data-main='/app/index', src='/assets/js/libs/require.js')
   script(src='/app/config.js')
 body
-  .navbar.navbar-fixed
+  .navbar.navbar-fixed-top
     .navbar-inner
       .container
         a.brand(href='/') Artikel Archiv
@@ -23,21 +23,12 @@ body
             a(href='about') About
           li
             a(href='contact') Contact
-      //
-        form.form-search.navbar-form.pull-right(action='')
-          input.input-small(type='text', placeholder='Username')
-          input.input-small(type='password', placeholder='Password')
-          button.btn(type='submit') Sign in
-  .fluid-container.sidebar-left
-    #sidebar.fluid-sidebar
-      .well
-        ul#categories.nav.list
-          li.nav-header Sparten
-    #viewer.fluid-content
-      h1#viewer-title Article Title
-      .row
-        #viewer-summary.span4
-        img#viewer-image.span12
-      .row#viewer-content
+  .container-fluid
+    .row-fluid
+      .span3
+        #sidebar.well.sidebar-nav
+          include sidebar
+      .span9
+        #content
     footer
       p &copy; Adrian Kuendig 2011

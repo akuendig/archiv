@@ -20,7 +20,7 @@ app.set('view options', {
 });
 
 // Ensure all routes go home, client side app..
-app.get("*", function(req, res) {
+app.get("/", function(req, res) {
   // fs.createReadStream(options.index).pipe(res);
   res.render("index.jade");
 });

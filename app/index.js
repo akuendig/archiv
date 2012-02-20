@@ -6,6 +6,13 @@ define("archiv", [
 ],
 
 function($, _, Backbone) {
+  var app = _.extend({}, Backbone.Event);
+
+  app.Const = {
+    CategoryListReset: "category:list:reset",
+    ArticleReset: "article:reset"
+  };
+
   Backbone.View.prototype.start = function() {
     if (this.model && this.modelEvents) {
         _.each(
@@ -36,15 +43,19 @@ function($, _, Backbone) {
   };
 
   Backbone.View.prototype.renderTemplate = function (data) {
-    var html = this.template(data || this.model.attributes)
-      , $el = this.$el || $('<div>');
+    var html = this.template(data || this.model.attributes);
 
-    $el[0] = html;
-    this.el = html;
-    this.$el = $el;
+    this.el = $(html);
 
     return this;
   };
+
+  $.single=function(a) {
+    return function(b) {
+      a[0] = b;
+      return a;
+    };
+  }($([1]));
 
   return {
     // Create a custom object with a nested Views object
@@ -61,10 +72,11 @@ require([
   "archiv",
   "jquery",
   "use!backbone",
-  "modules/menu"
+  "modules/sidebar",
+  "modules/category"
 ],
 
-function (archiv, jQuery, Backbone, Menu) {
+function (archiv, jQuery, Backbone, Sidebar, Category) {
   // Treat the jQuery ready function as the entry point to the application.
   // Inside this function, kick-off all initialization, everything up to this
   // point should be definitions.
@@ -77,33 +89,63 @@ function (archiv, jQuery, Backbone, Menu) {
     var MainRouter = Backbone.Router.extend({
       routes: {
         "": "index",
-        ":hash": "index"
+        ":hash": "index",
+        "about/": "about",
+        "contact": "contact",
+        "category/:cat": "category"
       },
 
       index: function(hash) {
-        var route = this
-          , menu = new Menu.MenuView({
-            collection: new Menu.Menu([
-              new Menu.Entry({name: 'Wirtschaft', href: 'wirtschaft'}),
-              new Menu.Entry({name: 'Schweiz', href: 'schweiz'}),
-              new Menu.Entry({name: 'Politik', href: 'politik'}),
-              new Menu.Entry({name: 'International', href: 'international'})
-            ])
-          });
-
-        menu.render();
+        var route = this;
 
         // Fix for hashes in pushState and hash fragment
-        if (hash && !route._alreadyTriggered) {
+        if (!route._initialized) {
+          this.initializeView();
+
           // Reset to home, pushState support automatically converts hashes
-          Backbone.history.navigate("", false);
+          Backbone.history.navigate("", true);
 
           // Trigger the default browser behavior
-          location.hash = hash;
+          location.hash = hash || "";
 
           // Set an internal flag to stop recursive looping
-          route._alreadyTriggered = true;
+          route._initialized = true;
         }
+      },
+
+      initializeView: function () {
+        var sidebar = new Sidebar.SidebarView({
+              collection: new Sidebar.Sidebar([
+                new Sidebar.Entry({name: 'Wirtschaft', href: 'category/wirtschaft'}),
+                new Sidebar.Entry({name: 'Schweiz', href: 'category/schweiz'}),
+                new Sidebar.Entry({name: 'Politik', href: 'category/politik'}),
+                new Sidebar.Entry({name: 'International', href: 'category/international'})
+              ])
+            })
+          , categoryView = new Category.CategoryView({
+              collection: new Category.Categories([
+                new Category.Entry({title: 'Title 1', summary: 'Summary 1'}),
+                new Category.Entry({title: 'Title 2', summary: 'Summary 2'}),
+                new Category.Entry({title: 'Title 3', summary: 'Summary 3'}),
+                new Category.Entry({title: 'Title 4', summary: 'Summary 4'})
+              ])
+            });
+
+        sidebar.render();
+        categoryView.render();
+
+      },
+
+      contact: function ( event ) {
+        this.index();
+      },
+
+      category: function ( event ) {
+        this.index();
+      },
+
+      about: function () {
+        this.index();
       }
     });
 
@@ -112,14 +154,14 @@ function (archiv, jQuery, Backbone, Menu) {
     app.router = new MainRouter();
 
     // Trigger the initial route and enable HTML5 History API support
-    Backbone.history.start({ pushState: true });
+    Backbone.history.start({ pushState: false });
 
     // All navigation that is relative should be passed through the navigate
     // method, to be processed by the router.  If the link has a data-bypass
     // attribute, bypass the delegation completely.
     $(document).on("click", "a:not([data-bypass])", function(evt) {
       // Get the anchor href and protcol
-      var href = this.href;
+      var href = this.getAttribute("href");
       var protocol = this.protocol + "//";
 
       // Ensure the protocol is not part of URL, meaning its relative.

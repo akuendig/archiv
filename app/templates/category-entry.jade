@@ -1,0 +1,11 @@
+.row
+  if self.image
+    .span1
+      img(src='#{image}', alt='article picture')
+    .span11
+      h3= title
+      p= summary
+  else
+    .span12
+      h3= title
+      p= summary
